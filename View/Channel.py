@@ -31,12 +31,13 @@ class Channel(QtGui.QWidget):
 
         width_coefficient = self.width() / len(frame_values)
         height_coefficient = self.height() / self.numbers_range
-        for i in range(len(frame_values) - 1):
-            start = QtCore.QPointF(width_coefficient * i,
-                                   (self.zero_amplitude - frame_values[i]) * height_coefficient)
-            finish = QtCore.QPointF(width_coefficient * (i + 1),
-                                    (self.zero_amplitude - frame_values[i + 1]) * height_coefficient)
-            self._draw_line(start, finish, painter)
+        points = []
+        for i in range(len(frame_values)):
+            x_coord = width_coefficient * i
+            y_coord = (self.zero_amplitude - frame_values[i]) * height_coefficient
+
+            points.append(QtCore.QPointF(x_coord, y_coord))
+        Channel._draw_lines(points, painter)
 
     def scale(self, mid_frame, scale_factor):
         """
@@ -48,8 +49,8 @@ class Channel(QtGui.QWidget):
         get_bound_scaled = functools.partial(Channel._get_bound_scaled,
                                              mid_frame=mid_frame,
                                              scale_factor=real_scale_factor)
-        self.start_frame = get_bound_scaled(self.start_frame)
-        self.finish_frame = get_bound_scaled(self.finish_frame)
+        self.start_frame = max(0, get_bound_scaled(self.start_frame))
+        self.finish_frame = min(len(self.channel), get_bound_scaled(self.finish_frame))
         self.repaint()
 
     def wheelEvent(self, event):
@@ -74,6 +75,11 @@ class Channel(QtGui.QWidget):
         prev_bound_dist = mid_frame - bound
         new_bound_dist = prev_bound_dist * scale_factor
         return int(mid_frame - new_bound_dist)
+
+    @staticmethod
+    def _draw_lines(points, painter):
+        for i in range(len(points) - 1):
+            Channel._draw_line(points[i], points[i + 1], painter)
 
     @staticmethod
     def _draw_line(start, finish, painter):
