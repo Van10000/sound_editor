@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from Core.PowOfTwoChannelCompressor import PowOfTwoChannelCompressor
 from Core.SmartChannelCompressor import SmartChannelCompressor
 import functools
 
@@ -13,6 +14,8 @@ class Channel(QtGui.QWidget):
         self.numbers_range = 256 ** sample_width
         self.start_frame = 0
         self.finish_frame = len(channel)
+        self.setMinimumSize(100, 100)
+        self.setStyleSheet("background-color: rgb(250,250,250);")
 
     def __len__(self):
         return self.finish_frame - self.start_frame
@@ -58,9 +61,6 @@ class Channel(QtGui.QWidget):
         if event.delta() > 0:
             scale_factor = 1 / scale_factor
         self.scale(len(self.channel) // 2, scale_factor)
-        self.repaint()
-        # def mouseMoveEvent(self, event):
-        # if event.buttons() == QtCore.Qt.MidButton:
 
     def _get_scaled_len(self, scale_factor):
         scaled_len = scale_factor * len(self)

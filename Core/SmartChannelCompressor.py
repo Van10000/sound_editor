@@ -1,4 +1,5 @@
 from Core.ChannelCompressor import ChannelCompressor
+#  TODO: tests
 
 
 class SmartChannelCompressor(ChannelCompressor):
