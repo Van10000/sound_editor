@@ -1,4 +1,5 @@
 from PyQt4 import QtGui, QtCore
+from Core.FramesGridUtils import FramesGridUtils
 from Core.PowOfTwoChannelCompressor import PowOfTwoChannelCompressor
 from Core.SmartChannelCompressor import SmartChannelCompressor
 import functools
@@ -7,9 +8,10 @@ import functools
 class Channel(QtGui.QWidget):
     MINIMAL_CHANNEL_LEN = 100
 
-    def __init__(self, channel, sample_width, parent=None):
+    def __init__(self, channel, sample_width, frame_rate, parent=None):
         super(Channel, self).__init__(parent)
-        self.channel_compressed = SmartChannelCompressor(channel, 2500)
+        self.channel_compressed = PowOfTwoChannelCompressor(channel, 2500)
+        self.frame_rate = frame_rate
         self.channel = channel
         self.numbers_range = 256 ** sample_width
         self.start_frame = 0
@@ -23,10 +25,18 @@ class Channel(QtGui.QWidget):
     def zero_amplitude(self):
         return self.numbers_range // 2
 
+    def get_time(self, frame_number):
+        return frame_number / self.frame_rate
+
+    @property
+    def start_frame_time(self):
+        return self.get_time(self.start_frame)
+
+    @property
+    def finish_frame_time(self):
+        return self.get_time(self.finish_frame)
+
     def paintEvent(self, paint_event):
-        painter = QtGui.QPainter(self)
-        painter.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0)))
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255, 255)))
         frame_values = self \
             .channel_compressed \
             .get_compressed_smart(self.start_frame, self.finish_frame)
@@ -39,7 +49,8 @@ class Channel(QtGui.QWidget):
             y_coord = (self.zero_amplitude - frame_values[i]) * height_coefficient
 
             points.append(QtCore.QPointF(x_coord, y_coord))
-        Channel._draw_lines(points, painter)
+        self.draw_vertical_grid(20)
+        self._draw_lines_by_points(points)
 
     def scale(self, mid_frame, scale_factor):
         """
@@ -63,6 +74,27 @@ class Channel(QtGui.QWidget):
             scaled_len = len(self.channel)
         return scaled_len
 
+    def draw_vertical_grid(self, density):
+        frame_numbers = FramesGridUtils.get_steps_coordinates(self.start_frame, self.finish_frame, density)
+        grid_lines = [self._get_vertical_line(frame_number) for frame_number in frame_numbers]
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtGui.QPen(QtGui.QColor(104, 104, 82, 80)))
+        Channel._draw_lines(grid_lines, painter)
+
+    def _get_vertical_line(self, frame_number):
+        if self.start_frame <= frame_number <= self.finish_frame:
+            frame_relative = frame_number - self.start_frame
+            frame_window = self.finish_frame - self.start_frame
+            width_coefficient = self.width() / frame_window
+            return QtCore.QLineF(QtCore.QPointF(width_coefficient * frame_relative, 0),
+                                 QtCore.QPointF(width_coefficient * frame_relative, self.height()))
+
+    def _draw_lines_by_points(self, points):
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtGui.QColor(0, 0, 0))
+        for i in range(len(points) - 1):
+            Channel._draw_line(points[i], points[i + 1], painter)
+
     @staticmethod
     def _get_bound_scaled(bound, mid_frame, scale_factor):
         prev_bound_dist = mid_frame - bound
@@ -70,9 +102,9 @@ class Channel(QtGui.QWidget):
         return int(mid_frame - new_bound_dist)
 
     @staticmethod
-    def _draw_lines(points, painter):
-        for i in range(len(points) - 1):
-            Channel._draw_line(points[i], points[i + 1], painter)
+    def _draw_lines(lines, painter):
+        for line in lines:
+            painter.drawLine(line)
 
     @staticmethod
     def _draw_line(start, finish, painter):
