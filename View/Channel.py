@@ -9,13 +9,12 @@ class Channel(QtGui.QWidget):
 
     def __init__(self, channel, sample_width, parent=None):
         super(Channel, self).__init__(parent)
-        self.channel_compressed = SmartChannelCompressor(channel, 1000)
+        self.channel_compressed = SmartChannelCompressor(channel, 2500)
         self.channel = channel
         self.numbers_range = 256 ** sample_width
         self.start_frame = 0
         self.finish_frame = len(channel)
         self.setMinimumSize(100, 100)
-        self.setStyleSheet("background-color: rgb(250,250,250);")
 
     def __len__(self):
         return self.finish_frame - self.start_frame
@@ -55,12 +54,6 @@ class Channel(QtGui.QWidget):
         self.start_frame = max(0, get_bound_scaled(self.start_frame))
         self.finish_frame = min(len(self.channel), get_bound_scaled(self.finish_frame))
         self.repaint()
-
-    def wheelEvent(self, event):
-        scale_factor = 1.15
-        if event.delta() > 0:
-            scale_factor = 1 / scale_factor
-        self.scale(len(self.channel) // 2, scale_factor)
 
     def _get_scaled_len(self, scale_factor):
         scaled_len = scale_factor * len(self)

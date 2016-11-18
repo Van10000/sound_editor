@@ -1,8 +1,8 @@
 import sys
 
 from PyQt4 import QtGui
-
 from View import Window
+# TODO: import vlc
 
 
 dir = r"C:\Users\ISmir\Desktop\учёба\2 курс\python\sound_editor\sounds" + "\\"
@@ -11,6 +11,9 @@ dir = r"C:\Users\ISmir\Desktop\учёба\2 курс\python\sound_editor\sounds"
 # new_state = WaveState.WaveState.read_from_file(dir + "temp_small.wav")
 # merged = state.get_appended(new_state)
 # merged.output_to_file(dir + "merged.wav")
+# TODO: p = vlc.MediaPlayer(dir + "merged.wav")
+# TODO: p.play()
 app = QtGui.QApplication(sys.argv)
 main_window = Window.Window()
 sys.exit(app.exec_())
+
