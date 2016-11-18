@@ -11,7 +11,7 @@ class ChannelsList(QtGui.QWidget):
         super(ChannelsList, self).__init__(parent)
         self.waveState = wave_state
 
-        self.channels = [Channel(ch, wave_state.sample_width, wave_state.frame_rate, self) for ch in wave_state.channels]
+        self.channels = [Channel(ch, wave_state.sample_width, wave_state.frame_rate) for ch in wave_state.channels]
 
         self.channels_layout = QtGui.QVBoxLayout()
         for channel in self.channels:

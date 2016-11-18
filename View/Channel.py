@@ -7,12 +7,14 @@ import functools
 
 class Channel(QtGui.QWidget):
     MINIMAL_CHANNEL_LEN = 100
+    DEFAULT_GRID_DENSITY = 20
 
-    def __init__(self, channel, sample_width, frame_rate, parent=None):
+    def __init__(self, channel, sample_width, frame_rate, grid_density=DEFAULT_GRID_DENSITY, parent=None):
         super(Channel, self).__init__(parent)
         self.channel_compressed = PowOfTwoChannelCompressor(channel, 2500)
         self.frame_rate = frame_rate
         self.channel = channel
+        self.grid_density = grid_density
         self.numbers_range = 256 ** sample_width
         self.start_frame = 0
         self.finish_frame = len(channel)
@@ -49,7 +51,7 @@ class Channel(QtGui.QWidget):
             y_coord = (self.zero_amplitude - frame_values[i]) * height_coefficient
 
             points.append(QtCore.QPointF(x_coord, y_coord))
-        self.draw_vertical_grid(20)
+        self.draw_vertical_grid()
         self._draw_lines_by_points(points)
 
     def scale(self, mid_frame, scale_factor):
@@ -74,8 +76,11 @@ class Channel(QtGui.QWidget):
             scaled_len = len(self.channel)
         return scaled_len
 
-    def draw_vertical_grid(self, density):
-        frame_numbers = FramesGridUtils.get_steps_coordinates(self.start_frame, self.finish_frame, density)
+    def get_vertical_grid_coordinates(self):
+        return FramesGridUtils.get_steps_coordinates(self.start_frame, self.finish_frame, self.grid_density)
+
+    def draw_vertical_grid(self):
+        frame_numbers = self.get_vertical_grid_coordinates()
         grid_lines = [self._get_vertical_line(frame_number) for frame_number in frame_numbers]
         painter = QtGui.QPainter(self)
         painter.setPen(QtGui.QPen(QtGui.QColor(104, 104, 82, 80)))
