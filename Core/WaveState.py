@@ -6,6 +6,9 @@ from Core import WaveUtils
 
 
 # Immutable class
+from Core.NumpyUtils import NumpyUtils
+
+
 class WaveState:
 
     @staticmethod
@@ -23,11 +26,15 @@ class WaveState:
     def get_default_loudness(length):
         return np.empty((length,), dtype=np.float32).fill(1)
 
-    def __init__(self, sample_width, frame_rate, channels, loudness):
+    @staticmethod
+    def get_empty_wave_state():
+        return WaveState(4, 44100, [NumpyUtils.to_numpy_array([0])])
+
+    def __init__(self, sample_width, frame_rate, channels, loudness=None):
         self.sample_width = sample_width
         self.frame_rate = frame_rate
         self.channels = channels
-        self.loudness = loudness
+        self.loudness = WaveState.get_default_loudness(len(self.channels[0])) if loudness is None else loudness
 
     def __str__(self):
         return str.format("channels_number:{0}, sample_width:{1}, "

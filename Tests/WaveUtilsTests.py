@@ -7,7 +7,7 @@ from Core import WaveUtils
 #  TODO: rename everything to snake_case
 #  TODO: arrange act assert pattern
 #  TODO: get rid of static methods and asserts. All that should be in TestingUtils.
-from Tests.NumpyArraysTest import NumpyArraysTest
+from Tests.NumpyArraysTests import NumpyArraysTest
 
 
 class TestWaveUtils(NumpyArraysTest):

@@ -1,5 +1,6 @@
 import numpy as np
 import unittest
+from Core.NumpyUtils import NumpyUtils
 
 
 class NumpyArraysTest(unittest.TestCase):
@@ -8,4 +9,4 @@ class NumpyArraysTest(unittest.TestCase):
 
     @staticmethod
     def to_numpy_array(numbers):
-        return np.array(list(map(np.int64, numbers)))
+        return NumpyUtils.to_numpy_array(numbers)

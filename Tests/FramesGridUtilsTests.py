@@ -1,7 +1,7 @@
 import unittest
 from Core.FramesGridUtils import FramesGridUtils
 import numpy as np
-from Tests.NumpyArraysTest import NumpyArraysTest
+from Tests.NumpyArraysTests import NumpyArraysTest
 
 
 class FramesGridUtilsTests(NumpyArraysTest):

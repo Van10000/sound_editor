@@ -1,5 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from pyqtgraph import PlotWidget, PlotDataItem, ViewBox
+from Core.CapturedAreaContainer import CapturedAreaContainer
 from Core.WaveState import WaveState
 
 
@@ -14,8 +15,11 @@ class Track(QtGui.QWidget):
     def __init__(self, wave_state, on_delete=None, parent=None):
         super(Track, self).__init__(parent)
         self.waveState = wave_state
+        self.captured_area_container = CapturedAreaContainer()
 
-        self.channels_list = ChannelsList(self.waveState)
+        self.channels_list = ChannelsList(self.waveState, self.captured_area_container)
+
+        self.captured_area_container.on_change = self.channels_list.repaint
 
         self.horizontal_layout = QtGui.QHBoxLayout()
         self.horizontal_layout.addWidget(self.channels_list)
@@ -29,11 +33,3 @@ class Track(QtGui.QWidget):
             self.horizontal_layout.addWidget(self.delete_button)
 
         self.setLayout(self.horizontal_layout)
-
-        # self.plot = PlotWidget(self)
-        # plot_item = self.plot.getPlotItem()
-        # plot_item.getViewBox().scaleBy(x=1, y=0.05)
-        # # plot_item.getViewBox().enableAutoRange(axis=ViewBox.XAxis, enable=True)
-        # plot_item.addItem(PlotDataItem(wave_state.channels[0]))
-        # plot_item.setDownsampling(auto=True, mode='peak')
-        # self.plot.resize(500, 200)
