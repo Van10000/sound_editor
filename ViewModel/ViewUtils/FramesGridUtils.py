@@ -35,11 +35,11 @@ class FramesGridUtils:
     @staticmethod
     def steps_count(step, start_frame, finish_frame):
         start_aligned = FramesGridUtils.get_start_aligned(start_frame, step)
-        length_aligned = finish_frame - start_aligned
+        length_aligned = finish_frame - 1 - start_aligned
         return length_aligned // step + 1
 
     @staticmethod
     def get_steps_coordinates(start_frame, finish_frame, maximal_steps_number):
         step = FramesGridUtils.get_precise_step_value(start_frame, finish_frame, maximal_steps_number)
         start_aligned = FramesGridUtils.get_start_aligned(start_frame, step)
-        return np.arange(start_aligned, finish_frame + 1, step, dtype=np.int64)
+        return np.arange(start_aligned, finish_frame, step, dtype=np.int64)

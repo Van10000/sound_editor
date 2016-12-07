@@ -1,35 +1,32 @@
-from PyQt4 import QtGui, QtCore
-from pyqtgraph import PlotWidget, PlotDataItem, ViewBox
-from Core.CapturedAreaContainer import CapturedAreaContainer
-from Core.WaveState import WaveState
+from PyQt4 import QtGui
 
-
-from View.Channel import Channel
+from ViewModel.ViewUtils.CapturedAreaContainer import CapturedAreaContainer
 from View.ChannelsList import ChannelsList
-from View.Constants import Constants
 from View.EffectsPanel import EffectsPanel
 
 
 class Track(QtGui.QWidget):
 
-    def __init__(self, wave_state, on_delete=None, parent=None):
+    def __init__(self, track_model, on_delete=None, parent=None):
         super(Track, self).__init__(parent)
-        self.waveState = wave_state
-        self.captured_area_container = CapturedAreaContainer()
+        track_model.call_after_wave_state_changed.append(self.update_track)
+        track_model.call_after_change.append(self.repaint)
+        self.track_model = track_model
+        self.on_delete = on_delete
 
-        self.channels_list = ChannelsList(self.waveState, self.captured_area_container)
-
-        self.captured_area_container.on_change = self.channels_list.repaint
-
+        self.channels_list = ChannelsList(self.track_model)
         self.horizontal_layout = QtGui.QHBoxLayout()
         self.horizontal_layout.addWidget(self.channels_list)
         self.horizontal_layout.addWidget(EffectsPanel(self))
 
-        if on_delete is not None:
-            self.delete_button = QtGui.QPushButton("Delete")
-            self.delete_button.clicked.connect(lambda: on_delete(self))
-            self.delete_button.setFixedWidth(50)
-            self.delete_button.setMinimumWidth(50)
-            self.horizontal_layout.addWidget(self.delete_button)
+        if self.on_delete is not None:
+            delete_button = QtGui.QPushButton("Delete")
+            delete_button.clicked.connect(lambda: self.on_delete(self))
+            delete_button.setFixedWidth(50)
+            delete_button.setMinimumWidth(50)
+            self.horizontal_layout.addWidget(delete_button)
 
         self.setLayout(self.horizontal_layout)
+
+    def update_track(self):
+        self.channels_list.update_track()

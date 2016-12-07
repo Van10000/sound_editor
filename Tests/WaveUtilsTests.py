@@ -1,8 +1,6 @@
-import unittest
-
 import numpy as np
 
-from Core import WaveUtils
+from Core.WaveState import WaveUtils
 #  TODO: refactor
 #  TODO: rename everything to snake_case
 #  TODO: arrange act assert pattern
@@ -11,10 +9,6 @@ from Tests.NumpyArraysTests import NumpyArraysTest
 
 
 class TestWaveUtils(NumpyArraysTest):
-    @staticmethod
-    def toNumpyArray(numbers):
-        return np.array(list(map(np.int64, numbers)))
-
     @staticmethod
     def channelsToNumpy(channels):
         return [np.array(channel, dtype=np.int64) for channel in channels]
@@ -36,7 +30,7 @@ class TestWaveUtils(NumpyArraysTest):
 
     def check_samples_to_frames(self, samples, sample_width, expected_frames):
         self.assertSequenceEqual(WaveUtils.samples_to_frames(
-            self.toNumpyArray(samples), sample_width),
+            self.to_numpy_array(samples), sample_width),
             expected_frames)
 
     def test_samples_to_channels(self):
@@ -54,7 +48,7 @@ class TestWaveUtils(NumpyArraysTest):
 
     def check_channels_to_samples(self, channels, expected_samples):
         self.assert_numpy_array_equal(WaveUtils.channels_to_samples(channels),
-                                   self.toNumpyArray(expected_samples))
+                                      self.to_numpy_array(expected_samples))
 
     def test_change_channel_resolution(self):
         self.check_change_channel_resolution([1, 3, 5, 9],
@@ -91,7 +85,7 @@ class TestWaveUtils(NumpyArraysTest):
                                           multiplier):
         self.assert_numpy_array_equal(
             WaveUtils.change_channels_sample_width(
-                [self.toNumpyArray(channel)], multiplier),
+                [self.to_numpy_array(channel)], multiplier),
             [expected_changed])
 
     def test_get_appended(self):

@@ -8,13 +8,17 @@ from View.TimePanel import TimePanel
 
 
 class ChannelsList(QtGui.QWidget):
-    def __init__(self, wave_state, captured_area_container, parent=None):
+    def __init__(self, track_model, parent=None):
         super(ChannelsList, self).__init__(parent)
-        self.waveState = wave_state
+        self.track_model = track_model
 
-        self.channels = [Channel(ch, wave_state.sample_width, wave_state.frame_rate, captured_area_container)
-                         for ch in wave_state.channels]
+        self.channels = [Channel(ch_model)
+                         for ch_model in self.track_model.channel_models]
+        for channel, channel_model in zip(self.channels, self.track_model.channel_models):
+            channel_model.call_after_change.append(channel.repaint)
+
         self.time_panel = TimePanel(self.channels[0])
+        self.track_model.call_after_change.append(self.time_panel.repaint)
 
         self.channels_layout = QtGui.QVBoxLayout()
         self.channels_layout.addWidget(self.time_panel)
@@ -26,19 +30,10 @@ class ChannelsList(QtGui.QWidget):
         self.wrapping_widget.setStyleSheet(Constants.TRACK_BACKGROUND_COLOR)
 
         self.wrapping_layout = QtGui.QFormLayout()
-        self.wrapping_layout.addWidget(self.wrapping_widget)
+        self.wrapping_layout.addRow(self.wrapping_widget)
         self.setLayout(self.wrapping_layout)
 
-    def scale(self, x_mid_ratio, scale_factor):
-        for channel in self.channels:
-            frame_len = channel.finish_frame - channel.start_frame
-            frame_mid = channel.start_frame + frame_len * x_mid_ratio
-            channel.scale(frame_mid, scale_factor)
-        self.time_panel.repaint()
-
-    def wheelEvent(self, event):
-        scale_factor = 1.15
-        if event.delta() > 0:
-            scale_factor = 1 / scale_factor
-        click_location_ratio = event.x() / self.width()
-        self.scale(click_location_ratio, scale_factor)
+    def update_track(self):
+        for channel, channel_model in zip(self.channels, self.track_model.channel_models):
+            channel.reset_channel_model(channel_model)
+        self.time_panel.reset_channel(self.channels[0])

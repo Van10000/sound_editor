@@ -1,3 +1,4 @@
+import threading
 
 
 class CapturedAreaContainer:
@@ -6,11 +7,17 @@ class CapturedAreaContainer:
         self.current_coord = 0
         self.is_released = False
         self.is_captured = False
-        self.on_change = None
+        self.call_after_change = []
+        self.call_after_capture = []
+        self.lock = threading.Lock()
 
-    def _changed(self):
-        if self.on_change is not None:
-            self.on_change()
+    def _after_change(self):
+        for func in self.call_after_change:
+            func()
+
+    def _after_capture(self):
+        for func in self.call_after_capture:
+            func()
 
     @property
     def start(self):
@@ -24,12 +31,13 @@ class CapturedAreaContainer:
         self.captured_coord = coord
         self.current_coord = coord
         self.is_captured = True
-        self._changed()
+        self._after_capture()
+        self._after_change()
 
     def move(self, x_coord):
         if not self.is_released:
             self.current_coord = x_coord
-            self._changed()
+            self._after_change()
         else:
             raise Exception("Container is released at the moment.")
 
@@ -37,8 +45,9 @@ class CapturedAreaContainer:
         self.is_released = True
 
     def drop(self):
-        self.captured_coord = 0
-        self.current_coord = 0
-        self.is_released = False  # TODO: maybe just run __init__? Will it work?
-        self.is_captured = False
-        self._changed()
+        if self.is_captured:
+            self.captured_coord = 0
+            self.current_coord = 0
+            self.is_released = False
+            self.is_captured = False
+            self._after_change()

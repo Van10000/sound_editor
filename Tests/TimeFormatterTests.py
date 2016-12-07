@@ -1,5 +1,6 @@
 import unittest
-from Core.TimeFormatter import TimeFormatter
+
+from ViewModel.ViewUtils.TimeFormatter import TimeFormatter
 
 
 class TimeFormatterTests(unittest.TestCase):

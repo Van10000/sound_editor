@@ -1,7 +1,9 @@
-from PyQt4 import QtGui, QtCore
-from Core.TimeFormatter import TimeFormatter
-from View.Channel import Channel
 import math
+from PyQt4 import QtGui, QtCore
+from ViewModel.ViewUtils.TimeFormatter import TimeFormatter
+
+# it's necessary for time panel to have the same size as channel for which this panel is created
+# obviously, otherwise time would be displayed incorrectly
 
 
 class TimePanel(QtGui.QWidget):
@@ -12,14 +14,28 @@ class TimePanel(QtGui.QWidget):
         self.channel = channel
         self.setFixedHeight(30)
 
+    @property
+    def channel_model(self):
+        return self.channel.channel_model
+
+    def reset_channel(self, channel):
+        self.channel = channel
+
+    def get_coordinate_from_frame_number(self, frame_number):
+        ratio = self.channel_model.get_ratio_from_frame_number(frame_number)
+        return ratio * self.width()
+
     def paintEvent(self, event):
-        frames = self.channel.get_vertical_grid_frames()
-        time_moments = [self.channel.get_time_from_frame(frame) for frame in frames]
-        coordinates = [self.channel.get_coordinate_from_frame(frame) for frame in frames]
-        time_precision = int(max(math.log10(10 * len(time_moments)) -
-                                 math.log10(time_moments[-1] - time_moments[0]), 0))
+        grid_density = self.channel.grid_density
+        frames = self.channel_model.get_vertical_grid_frames(grid_density)
+        time_moments = [self.channel_model.get_time_from_frame(frame)
+                        for frame in frames]
+        coordinates = [self.get_coordinate_from_frame_number(frame)
+                       for frame in frames]
+        time_precision = TimePanel.get_time_precision(time_moments)
         for time, coordinate in zip(time_moments, coordinates):
-            self.draw_time_moment(coordinate, TimeFormatter.format(time, time_precision))
+            time_formatted = TimeFormatter.format(time, time_precision)
+            self.draw_time_moment(coordinate, time_formatted)
 
     def draw_time_moment(self, coordinate, time_str):
         painter = QtGui.QPainter(self)
@@ -30,6 +46,13 @@ class TimePanel(QtGui.QWidget):
         y = self.height() * 0.05
         text_rectangle = QtCore.QRectF(x, y, width, height)
         painter.drawText(text_rectangle, time_str)
+
+    @staticmethod
+    def get_time_precision(time_moments):
+        moments_number_coefficient = math.log10(10 * len(time_moments))
+        range_size_coefficient = math.log10(time_moments[-1] - time_moments[0])
+        total_coefficient = moments_number_coefficient - range_size_coefficient
+        return int(max(total_coefficient, 0))
 
 
 

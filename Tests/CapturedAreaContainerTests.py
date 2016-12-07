@@ -1,5 +1,6 @@
 import unittest
-from Core.CapturedAreaContainer import CapturedAreaContainer
+
+from ViewModel.ViewUtils.CapturedAreaContainer import CapturedAreaContainer
 
 
 class CapturedAreaContainerTests(unittest.TestCase):

@@ -2,7 +2,7 @@ import wave
 
 import numpy as np
 
-from Core import WaveUtils
+from Core.WaveState import WaveUtils
 
 
 # Immutable class
@@ -24,7 +24,9 @@ class WaveState:
 
     @staticmethod
     def get_default_loudness(length):
-        return np.empty((length,), dtype=np.float32).fill(1)
+        loudness = np.empty([length], dtype=np.float32)
+        loudness.fill(1)
+        return loudness
 
     @staticmethod
     def get_empty_wave_state():
@@ -41,6 +43,9 @@ class WaveState:
                           "frame_rate:{2}, frames_number:{3}",
                           self.channels_number, self.sample_width,
                           self.frame_rate, self.frames_number)
+
+    def __len__(self):
+        return len(self.channels[0])
 
     def get_with_changed_tempo_and_pitch(self, coefficient):
         return WaveState(self.sample_width,
@@ -69,6 +74,12 @@ class WaveState:
                          WaveUtils.get_appended(self.channels,
                                                 wave_state.channels),
                          np.append(self.loudness, wave_state.loudness))
+
+    def get_inserted(self, wave_state, start_sample):
+        wave_state = wave_state.to_same_format(self)
+        start_part = self.get_part(0, start_sample)
+        finish_part = self.get_part(start_sample, len(self))
+        return start_part.get_appended(wave_state).get_appended(finish_part)
 
     @property
     def samples_number(self):
@@ -105,7 +116,7 @@ class WaveState:
                 wave_state.channels_number)
         return new_self
 
-    def get_with_changed_frame_rate(self, new_frame_rate):  # TODO: probably it's better to use FFT
+    def get_with_changed_frame_rate(self, new_frame_rate):
         coefficient = new_frame_rate / self.frame_rate
         new_channels = WaveUtils.change_channels_resolution(
             self.channels, coefficient, np.int64)
