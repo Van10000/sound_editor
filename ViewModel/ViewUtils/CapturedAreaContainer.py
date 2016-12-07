@@ -1,4 +1,3 @@
-import threading
 
 
 class CapturedAreaContainer:
@@ -9,7 +8,6 @@ class CapturedAreaContainer:
         self.is_captured = False
         self.call_after_change = []
         self.call_after_capture = []
-        self.lock = threading.Lock()
 
     def _after_change(self):
         for func in self.call_after_change:
@@ -26,6 +24,12 @@ class CapturedAreaContainer:
     @property
     def finish(self):
         return max(self.captured_coord, self.current_coord)
+
+    def capture_segment(self, start, length):
+        self.drop()
+        self.capture(start)
+        self.move(start + length)
+        self.release()
 
     def capture(self, coord):
         self.captured_coord = coord

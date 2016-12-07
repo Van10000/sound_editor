@@ -34,3 +34,8 @@ class ViewModel(AbstractModel):
             selected_track = self.get_selected_track()
             if selected_track is not None:
                 selected_track.insert_part(self.clipboard)
+
+    def delete(self):
+        selected_track = self.get_selected_track()
+        if selected_track is not None:
+            selected_track.delete_selected_part()

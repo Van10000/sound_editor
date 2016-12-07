@@ -99,15 +99,18 @@ class Channel(QtGui.QWidget):
     def mousePressEvent(self, event):
         self.captured_area_container.drop()
         if event.button() == QtCore.Qt.LeftButton:
-            frame_number = self.get_frame_number_from_coordinate(event.x())
+            x = self._put_x_in_bounds(event.x())
+            frame_number = self.get_frame_number_from_coordinate(x)
             self.captured_area_container.capture(frame_number)
 
     def mouseMoveEvent(self, event):
-        frame_number = self.get_frame_number_from_coordinate(event.x())
+        x = self._put_x_in_bounds(event.x())
+        frame_number = self.get_frame_number_from_coordinate(x)
         self.captured_area_container.move(frame_number)
 
     def mouseReleaseEvent(self, event):
-        frame_number = self.get_frame_number_from_coordinate(event.x())
+        x = self._put_x_in_bounds(event.x())
+        frame_number = self.get_frame_number_from_coordinate(x)
         self.captured_area_container.move(frame_number)
         self.captured_area_container.release()
 
@@ -115,5 +118,16 @@ class Channel(QtGui.QWidget):
         scale_factor = 1.15
         if event.delta() > 0:
             scale_factor = 1 / scale_factor
-        click_location_ratio = event.x() / self.width()
-        self.channel_model.track_model.scale(click_location_ratio, scale_factor)
+        wheel_location_ratio = event.x() / self.width()
+        self.channel_model.track_model.scale(wheel_location_ratio, scale_factor)
+
+    def _put_x_in_bounds(self, x):
+        return Channel._put_in_bounds(x, 0, self.width())
+
+    @staticmethod
+    def _put_in_bounds(value, left, right):
+        if value < left:
+            return left
+        if value > right:
+            return right
+        return value

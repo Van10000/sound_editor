@@ -31,23 +31,24 @@ class TrackModel(AbstractModel):
             frame_rate = self.wave_state.frame_rate
             yield ChannelModel(channel, sample_width, frame_rate, self)
 
+    @property
+    def captured_start(self):
+        return self.captured_area_container.start
+
+    @property
+    def captured_finish(self):
+        return self.captured_area_container.finish
+
     def update_channel_models(self):
         self.channel_models = list(self.build_channel_models())
-        # if len(self.channel_models) != len(self.wave_state.channels):
-        #     raise Exception("Number of channels changed for the track. Was {} but found {}"
-        #                     .format(len(self.channel_models),
-        #                             len(self.wave_state.channels)))
-        # for i, model in zip(range(len(self.channel_models)), self.build_channel_models()):
-        #     self.channel_models[i] = model
 
     def drop_other_captures(self):
         self.view_model.drop_capture_from_other_tracks(self)
 
     def get_selected_part(self):
         if self.captured_area_container.is_released:
-            start = self.captured_area_container.start
-            finish = self.captured_area_container.finish
-            return self.wave_state.get_part(start, finish)
+            return self.wave_state.get_part(self.captured_start,
+                                            self.captured_finish)
 
     def set_wave_state(self, new_wave_state):
         self.wave_state = new_wave_state
@@ -55,12 +56,20 @@ class TrackModel(AbstractModel):
 
     def insert_part(self, part_wave_state):
         if self.captured_area_container.is_released:
-            start = self.captured_area_container.start
-            self.set_wave_state(self.wave_state.get_inserted(part_wave_state,
-                                                             start))
-            self.captured_area_container.drop()
-            self.captured_area_container.capture(start)
-            self.captured_area_container.move(start + len(part_wave_state))
-            self.captured_area_container.release()
+            new_state = self.wave_state.get_inserted(
+                part_wave_state, self.captured_start)
+
+            self.set_wave_state(new_state)
+            self.captured_area_container.capture_segment(
+                self.captured_start, len(part_wave_state))
+
+            self._wave_state_changed()
+
+    def delete_selected_part(self):
+        if self.captured_area_container.is_released:
+            new_state = self.wave_state.get_with_deleted_part(
+                self.captured_start, self.captured_finish)
+            self.set_wave_state(new_state)
+            self.captured_area_container.capture_segment(self.captured_start, 0)
 
             self._wave_state_changed()
