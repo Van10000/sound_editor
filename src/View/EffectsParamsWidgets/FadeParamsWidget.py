@@ -42,11 +42,18 @@ class FadeParamsWidget(EffectParamsWidget):
         self.finish_time_line.line_edit.setText(str(finish_time))
 
     def apply_fade(self, fade_func):
-        start_time = float(self.start_time_text)
-        finish_time = float(self.finish_time_text)
-        start_frame = self.track_model.get_frame_from_time(start_time)
-        finish_frame = self.track_model.get_frame_from_time(finish_time)
-        fade_func(start_frame, finish_frame)
+        try:
+            start_time = int(round(float(self.start_time_text)))
+            finish_time = int(round(float(self.finish_time_text)))
+        except ValueError:
+            message_box = QtGui.QMessageBox()
+            message_box.warning(self.parent(), "Fade wasn't applied", "Time should be a decimal number")
+            return False
+        else:
+            start_frame = self.track_model.get_frame_from_time(start_time)
+            finish_frame = self.track_model.get_frame_from_time(finish_time)
+            fade_func(start_frame, finish_frame)
+            return True
 
     def validate(self):
         self.set_bounds()

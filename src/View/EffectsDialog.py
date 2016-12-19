@@ -31,6 +31,6 @@ class EffectsDialog(QtGui.QDialog):
         self.current_effect_index = selected_effect_index
 
     def apply_effect(self):
-        self.effects_widgets[self.current_effect_index].apply_effect()
-        self.hide()
+        if self.effects_widgets[self.current_effect_index].apply_effect():
+            self.hide()
 
