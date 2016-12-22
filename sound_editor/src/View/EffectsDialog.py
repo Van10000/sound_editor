@@ -1,4 +1,5 @@
 from PyQt4 import QtGui
+from threading import Thread
 
 
 class EffectsDialog(QtGui.QDialog):
@@ -23,6 +24,7 @@ class EffectsDialog(QtGui.QDialog):
         self.main_layout.addRow(self.main_effects_widget)
         self.main_layout.addRow(self.apply_button)
         self.setLayout(self.main_layout)
+        self._effect_appliance_result = False
 
     def switch_effect(self, selected_effect_index):
         self.effects_layout.removeWidget(self.effects_widgets[self.current_effect_index])
