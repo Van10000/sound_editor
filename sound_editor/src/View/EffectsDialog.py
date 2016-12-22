@@ -4,6 +4,7 @@ from PyQt4 import QtGui
 class EffectsDialog(QtGui.QDialog):
     def __init__(self, effects_names, effects_widgets, parent=None):
         super().__init__(parent)
+        self.setModal(True)
         self.effects_names = effects_names
         self.effects_widgets = effects_widgets
         self.combo_box = QtGui.QComboBox(self)

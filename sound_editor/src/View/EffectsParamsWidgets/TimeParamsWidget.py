@@ -4,7 +4,7 @@ from View.Utils.NamedLineEdit import NamedLineEdit
 from View.Utils.TimeInputWidget import TimeInputWidget
 
 
-class FadeParamsWidget(EffectParamsWidget):
+class TimeParamsWidget(EffectParamsWidget):
     def __init__(self, track_model, parent=None):
         super().__init__(parent)
         self.track_model = track_model
@@ -22,11 +22,11 @@ class FadeParamsWidget(EffectParamsWidget):
         finish_time = self.track_model.get_time_from_frame(finish_frame)
         self.time_input.set_bounds_time(start_time, finish_time)
 
-    def apply_fade(self, fade_func):
+    def apply_effect_by_func(self, effect_func):
         start_time, finish_time = self.time_input.get_bounds_time()
         start_frame, finish_frame = map(self.track_model.get_frame_from_time,
                                         (start_time, finish_time,))
-        fade_func(start_frame, finish_frame)
+        effect_func(start_frame, finish_frame)
         return True
 
     def validate(self):

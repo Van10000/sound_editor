@@ -80,8 +80,6 @@ def change_channels_sample_width(channels, sample_width_multiplier):
 def get_appended(chs1, chs2):
     return [np.append(chs1[i], chs2[i]) for i in range(len(chs1))]
 
-# TODO: check if there is 'insert' function in numpy. Most likely, there is.
-
 
 def get_reversed(channels):
     return [channel[::-1] for channel in channels]

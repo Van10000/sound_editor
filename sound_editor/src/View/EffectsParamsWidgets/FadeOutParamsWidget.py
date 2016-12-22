@@ -1,6 +1,6 @@
-from View.EffectsParamsWidgets.FadeParamsWidget import FadeParamsWidget
+from View.EffectsParamsWidgets.TimeParamsWidget import TimeParamsWidget
 
 
-class FadeOutParamsWidget(FadeParamsWidget):
+class FadeOutParamsWidget(TimeParamsWidget):
     def apply_effect(self):
-        return self.apply_fade(self.track_model.fade_out)
+        return self.apply_effect_by_func(self.track_model.fade_out)

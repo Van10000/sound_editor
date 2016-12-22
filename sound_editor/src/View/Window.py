@@ -1,6 +1,7 @@
 from PyQt4 import QtGui, QtCore
 from Core.WaveState.WaveState import WaveState
 from View.EffectsParamsWidgets.ChangeSpeedParamsWidget import ChangeSpeedParamsWidget
+from View.EffectsParamsWidgets.CompressSoundParamsWidget import CompressSoundParamsWidget
 from View.EffectsParamsWidgets.FadeInParamsWidget import FadeInParamsWidget
 from View.EffectsParamsWidgets.FadeOutParamsWidget import FadeOutParamsWidget
 from View.Track import Track
@@ -77,6 +78,7 @@ class Window(QtGui.QMainWindow):
         track.actions_panel.add_effect("Fade in", FadeInParamsWidget(track_model))
         track.actions_panel.add_effect("Fade out", FadeOutParamsWidget(track_model))
         track.actions_panel.add_effect("Change speed", ChangeSpeedParamsWidget(track_model))
+        track.actions_panel.add_effect("Compress sound", CompressSoundParamsWidget(track_model))
         add_button = track.actions_panel.add_button
         add_button("Delete", lambda: self.delete_track(track))
         add_button("Save", lambda: self.save_to_file(track_model.wave_state))

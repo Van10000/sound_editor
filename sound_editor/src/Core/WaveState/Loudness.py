@@ -13,12 +13,16 @@ class Loudness:
         return Loudness.get_fade(fade_length, False)
 
     @staticmethod
-    def get_fade(fade_length, from_start):
+    def get_general_fade(fade_length, to_ratio, from_start):
         step = Loudness.LOUDNESS_TYPE(1 / fade_length)
-        loudness = np.arange(0, 1, step)
+        loudness = np.arange(to_ratio, 1, step)
         if not from_start:
             loudness = loudness[::-1]
         return loudness[:fade_length:]
+
+    @staticmethod
+    def get_fade(fade_length, from_start):
+        return Loudness.get_general_fade(fade_length, 0, from_start)
 
     @staticmethod
     def get_ones(length):

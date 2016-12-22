@@ -1,3 +1,4 @@
+from Core.SoundEffects.SoundCompressor import SoundCompressor
 from Core.WaveState.Loudness import Loudness
 from Core import Utils
 from ViewModel.AbstractModel import AbstractModel
@@ -163,6 +164,15 @@ class TrackModel(AbstractModel):
         new_length = int(round((finish_frame - start_frame) / ratio))
         self.captured_area_container.capture_segment(start_frame,
                                                      new_length)
+        self._wave_state_changed()
+
+    def compress_sound(self, start_frame, finish_frame, ratio):
+        new_state = self.wave_state.get_compressed(start_frame,
+                                                   finish_frame,
+                                                   ratio)
+        self.set_wave_state(new_state)
+        self.captured_area_container.capture_segment(start_frame,
+                                                     finish_frame - start_frame)
         self._wave_state_changed()
 
     def _get_scaled_len(self, scale_factor):

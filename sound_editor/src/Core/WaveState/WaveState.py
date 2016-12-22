@@ -1,5 +1,7 @@
 import wave
 import numpy as np
+import functools
+from Core.SoundEffects.SoundCompressor import SoundCompressor
 
 from Core.WaveState import WaveUtils
 from Core.NumpyUtils import NumpyUtils
@@ -43,15 +45,14 @@ class WaveState:
                          self.channels)
 
     def get_part_with_changed_tempo_and_pitch(self, start_sample, end_sample, coefficient):
-        part = self.get_part(start_sample, end_sample)
-        with_deleted_part = self.get_with_deleted_part(start_sample, end_sample)
-        part = part.get_with_changed_tempo_and_pitch(coefficient)
-        return with_deleted_part.get_inserted(part, start_sample)
+        effect_func = functools.partial(self.get_with_changed_tempo_and_pitch,
+                                        coefficient=coefficient)
+        return self.get_part_with_effect(start_sample, end_sample, effect_func)
 
     def get_part(self, start_sample, end_sample):
         new_channels = [channel[start_sample:end_sample]
                         for channel in self.channels]
-        return WaveState(self.sample_width, self.frame_rate, new_channels)
+        return self.get_with_changed_channels(new_channels)
 
     def get_with_replaced_part(self, start_sample, part):
         with_deleted = self.get_with_deleted_part(start_sample,
@@ -62,20 +63,23 @@ class WaveState:
     def get_with_deleted_part(self, start_sample, end_sample):
         new_channels = [np.append(channel[:start_sample], channel[end_sample:])
                         for channel in self.channels]
-        return WaveState(self.sample_width, self.frame_rate, new_channels)
+        return self.get_with_changed_channels(new_channels)
 
     def get_with_reversed_part(self, start_sample, end_sample):
         new_channels = [np.append(channel[:start_sample],
                                   np.append(channel[end_sample:start_sample:-1],
                                             channel[end_sample:]))
                         for channel in self.channels]
-        return WaveState(self.sample_width, self.frame_rate, new_channels)
+        return self.get_with_changed_channels(new_channels)
 
     def get_appended(self, wave_state):
         wave_state = wave_state.to_same_format(self)
-        return WaveState(self.sample_width, self.frame_rate,
-                         WaveUtils.get_appended(self.channels,
-                                                wave_state.channels))
+        WaveUtils.get_sum_channels(self.channels,
+                                   WaveUtils.get_appended(self.channels,
+                                                          wave_state.channels))
+        return self.get_with_changed_channels(
+            WaveUtils.get_appended(self.channels,
+                                   wave_state.channels))
 
     def get_inserted(self, wave_state, start_sample):
         wave_state = wave_state.to_same_format(self)
@@ -85,9 +89,19 @@ class WaveState:
 
     def get_added(self, wave_state):
         wave_state = wave_state.to_same_format(self)
-        return WaveState(self.sample_width, self.frame_rate,
-                         WaveUtils.get_sum_channels(self.channels,
-                                                    wave_state.channels))
+        return self.get_with_changed_channels(
+            WaveUtils.get_sum_channels(self.channels,
+                                       wave_state.channels))
+
+    def get_compressed(self, start_sample, end_sample, intensity):
+        effect_func = functools.partial(SoundCompressor.compress, intensity=intensity)
+        return self.get_part_with_effect(start_sample, end_sample, effect_func)
+
+    def get_part_with_effect(self, start_sample, end_sample, effect_func):
+        part = self.get_part(start_sample, end_sample)
+        with_deleted_part = self.get_with_deleted_part(start_sample, end_sample)
+        part = effect_func(part)
+        return with_deleted_part.get_inserted(part, start_sample)
 
     @property
     def samples_number(self):
@@ -127,8 +141,7 @@ class WaveState:
         coefficient = new_frame_rate / self.frame_rate
         new_channels = WaveUtils.change_channels_resolution(
             self.channels, coefficient, self.SAMPLE_TYPE)
-        return WaveState(self.sample_width, new_frame_rate,
-                         new_channels)
+        return self.get_with_changed_channels(new_channels)
 
     def get_with_changed_channels_number(self, new_channels_number):
         average_channel = WaveUtils.get_average_channel(self.channels)
@@ -140,7 +153,7 @@ class WaveState:
         else:
             new_channels = [average_channel
                             for i in range(new_channels_number)]
-        return WaveState(self.sample_width, self.frame_rate, new_channels)
+        return self.get_with_changed_channels(new_channels)
 
     def get_with_changed_sample_width(self, new_sample_width):
         if new_sample_width not in WaveUtils.TYPES:
@@ -154,5 +167,8 @@ class WaveState:
         correct_channels = \
             [(ch * loudness_ratios_array).astype(dtype=self.SAMPLE_TYPE)
              for ch in self.channels]
-        return WaveState(self.sample_width, self.frame_rate, correct_channels)
+        return self.get_with_changed_channels(correct_channels)
+
+    def get_with_changed_channels(self, new_channels):
+        return WaveState(self.sample_width, self.frame_rate, new_channels)
 
