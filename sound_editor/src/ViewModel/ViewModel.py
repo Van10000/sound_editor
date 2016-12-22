@@ -59,6 +59,19 @@ class ViewModel(AbstractModel):
             new_track_model = TrackModel(selected_part, self)
             return new_track_model
 
+    def to_end(self):
+        selected_track = self.get_selected_track()
+        if selected_track is not None:
+            container = selected_track.captured_area_container
+            track_length = len(selected_track.wave_state)
+            container.capture_segment(track_length - 1, track_length)
+
+    def to_begin(self):
+        selected_track = self.get_selected_track()
+        if selected_track is not None:
+            container = selected_track.captured_area_container
+            container.capture_segment(0, 1)
+
     def get_sum(self):
         active_tracks = filter(lambda model: model.is_active,
                                self.track_models)

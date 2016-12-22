@@ -28,6 +28,8 @@ class Window(QtGui.QMainWindow):
         self.edit_menu = main_menu.addMenu('&Edit')
 
         self.add_menu_item(self.file_menu, "&Open", self.open_file, QtGui.QKeySequence.Open)
+        self.add_menu_item(self.edit_menu, "&To end", self.view_model.to_end, QtGui.QKeySequence.MoveToNextWord)
+        self.add_menu_item(self.edit_menu, "&To begin", self.view_model.to_begin, QtGui.QKeySequence.MoveToPreviousWord)
         self.add_menu_item(self.edit_menu, "&Copy", self.view_model.copy, QtGui.QKeySequence.Copy)
         self.add_menu_item(self.edit_menu, "&Paste", self.view_model.paste, QtGui.QKeySequence.Paste)
         self.add_menu_item(self.edit_menu, "&Delete", self.view_model.delete, QtGui.QKeySequence.Delete)
