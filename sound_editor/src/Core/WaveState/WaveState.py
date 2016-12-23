@@ -1,7 +1,7 @@
 import wave
 import numpy as np
 import functools
-from Core.SoundEffects.SoundCompressor import SoundCompressor
+from Core.SoundEffects import SoundCompressor
 
 from Core.WaveState import WaveUtils
 from Core.NumpyUtils import NumpyUtils
@@ -63,6 +63,10 @@ class WaveState:
     def get_with_deleted_part(self, start_sample, end_sample):
         new_channels = [np.append(channel[:start_sample], channel[end_sample:])
                         for channel in self.channels]
+        return self.get_with_changed_channels(new_channels)
+
+    def get_reversed(self):
+        new_channels = [ch[::-1] for ch in self.channels]
         return self.get_with_changed_channels(new_channels)
 
     def get_with_reversed_part(self, start_sample, end_sample):
