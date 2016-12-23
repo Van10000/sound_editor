@@ -4,6 +4,7 @@ from Core import Utils
 from ViewModel.AbstractModel import AbstractModel
 from ViewModel.ChannelModel import ChannelModel
 from ViewModel.ViewUtils.CapturedAreaContainer import CapturedAreaContainer
+import threading
 import functools
 
 
@@ -148,12 +149,16 @@ class TrackModel(AbstractModel):
     def fade_out(self, start_frame, finish_frame):
         self.fade(start_frame, finish_frame, False)
 
-    def change_speed(self, start_frame, finish_frame, ratio):
+    def get_changed_speed_wave_state(self, start_frame, finish_frame, ratio):
         if start_frame <= 0 and finish_frame >= len(self.wave_state):
-            new_state = self.wave_state.get_with_changed_tempo_and_pitch(ratio)
+            return self.wave_state.get_with_changed_tempo_and_pitch(ratio)
         else:
-            new_state = self.wave_state.\
+            return self.wave_state.\
                 get_part_with_changed_tempo_and_pitch(start_frame,
+                                                      finish_frame, ratio)
+
+    def change_speed(self, start_frame, finish_frame, ratio):
+        new_state = self.get_changed_speed_wave_state(start_frame,
                                                       finish_frame, ratio)
         finish_time, start_time = map(self.get_time_from_frame,
                                       (finish_frame, start_frame))

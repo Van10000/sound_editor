@@ -1,5 +1,4 @@
 from PyQt4 import QtGui
-from threading import Thread
 
 
 class EffectsDialog(QtGui.QDialog):
@@ -34,6 +33,7 @@ class EffectsDialog(QtGui.QDialog):
         self.current_effect_index = selected_effect_index
 
     def apply_effect(self):
-        if self.effects_widgets[self.current_effect_index].apply_effect():
+        effect = self.effects_widgets[self.current_effect_index]
+        if effect.apply_effect():
             self.hide()
 

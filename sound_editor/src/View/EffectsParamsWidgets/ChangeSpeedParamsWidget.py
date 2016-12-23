@@ -7,4 +7,4 @@ from View.Utils.TimeInputWidget import TimeInputWidget
 
 class ChangeSpeedParamsWidget(TimeAndRatioParamsWidget):
     def apply_effect(self):
-        self.apply_effect_by_func(self.track_model.change_speed)
+        return self.apply_effect_by_func(self.track_model.change_speed)
