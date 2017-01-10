@@ -3,7 +3,8 @@ import functools
 from PyQt4 import QtGui, QtCore
 
 from ViewModel.ViewUtils.FramesGridUtils import FramesGridUtils
-from ViewModel.ViewUtils.PowOfTwoChannelCompressor import PowOfTwoChannelCompressor
+from ViewModel.ViewUtils.PowOfTwoChannelCompressor \
+    import PowOfTwoChannelCompressor
 from Core import Utils
 
 
@@ -43,7 +44,8 @@ class Channel(QtGui.QWidget):
 
         for i in range(len(frame_values)):
             x_coord = width_coefficient * i
-            y_coord = (self.channel_model.zero_amplitude - frame_values[i]) * height_coefficient
+            height = (self.channel_model.zero_amplitude - frame_values[i])
+            y_coord = height * height_coefficient
             points.append(QtCore.QPointF(x_coord, y_coord))
 
         self.fill_captured_area()
@@ -56,8 +58,12 @@ class Channel(QtGui.QWidget):
 
     def fill_captured_area(self):
         if self.captured_area_container.is_captured:
-            self.fill_background(self.get_coordinate_from_frame_number(self.captured_area_container.start),
-                                 self.get_coordinate_from_frame_number(self.captured_area_container.finish),
+            captured_start = self.captured_area_container.start
+            captured_finish = self.captured_area_container.finish
+            coord_start, coord_finish = map(
+                self.get_coordinate_from_frame_number,
+                (captured_start, captured_finish,))
+            self.fill_background(coord_start, coord_finish,
                                  Channel.CAPTURED_AREA_COLOR)
 
     def fill_background(self, start_x, finish_x, color):
@@ -66,9 +72,11 @@ class Channel(QtGui.QWidget):
         painter.fillRect(start_x, 0, width, self.height(), QtGui.QBrush(color))
 
     def draw_vertical_grid(self):
-        frame_numbers = self.channel_model.get_vertical_grid_frames(self.grid_density)
-        frame_coordinates = [self.get_coordinate_from_frame_number(frame_number)
-                             for frame_number in frame_numbers]
+        frame_numbers = self.channel_model.get_vertical_grid_frames(
+            self.grid_density)
+        frame_coordinates = [
+            self.get_coordinate_from_frame_number(frame_number)
+            for frame_number in frame_numbers]
         grid_lines = [self._get_vertical_line(frame_coordinate)
                       for frame_coordinate in frame_coordinates]
         painter = QtGui.QPainter(self)
@@ -107,20 +115,23 @@ class Channel(QtGui.QWidget):
     def mouseMoveEvent(self, event):
         x = self._put_x_in_bounds(event.x())
         frame_number = self.get_frame_number_from_coordinate(x)
-        self.captured_area_container.move(frame_number)
+        if not self.captured_area_container.is_released:
+            self.captured_area_container.move(frame_number)
 
     def mouseReleaseEvent(self, event):
         x = self._put_x_in_bounds(event.x())
         frame_number = self.get_frame_number_from_coordinate(x)
-        self.captured_area_container.move(frame_number)
-        self.captured_area_container.release()
+        if not self.captured_area_container.is_released:
+            self.captured_area_container.move(frame_number)
+            self.captured_area_container.release()
 
     def wheelEvent(self, event):
         scale_factor = 1.15
         if event.delta() > 0:
             scale_factor = 1 / scale_factor
         wheel_location_ratio = event.x() / self.width()
-        self.channel_model.track_model.scale(wheel_location_ratio, scale_factor)
+        self.channel_model.track_model.scale(wheel_location_ratio,
+                                             scale_factor)
 
     def _put_x_in_bounds(self, x):
         return Utils.put_in_bounds(x, 0, self.width())

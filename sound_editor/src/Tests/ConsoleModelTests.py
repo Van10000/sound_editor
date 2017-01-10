@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir))
 import unittest
 from ConsoleSoundEditor.ConsoleModel import ConsoleModel
 
@@ -18,3 +21,6 @@ class ConsoleModelTests(unittest.TestCase):
         time_in_seconds = ConsoleModel._parse_time_to_seconds(time_str)
 
         self.assertAlmostEqual(time_in_seconds, expected_result, delta=1e-3)
+
+if __name__ == '__main__':
+    unittest.main()

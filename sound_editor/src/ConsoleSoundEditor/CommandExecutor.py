@@ -1,6 +1,6 @@
 import functools
 
-from ConsoleSoundEditor.ConsoleModel import ConsoleModel as CM
+from ConsoleSoundEditor.ConsoleModel import ConsoleModel
 
 
 class CommandExecutor:
@@ -17,7 +17,7 @@ class CommandExecutor:
 
     def execute(self, raw_command):
         command = CommandExecutor.parse_command(raw_command)
-        if len(command) == 0:
+        if not command:
             return
         command_type = command[0]
         try:
@@ -37,51 +37,54 @@ class CommandExecutor:
 
     def add_all_commands(self):
         add = self.add_command
+        model = ConsoleModel
         add("help", self.get_command_help, "Prints command help.\n"
                                            "Format: <command>.\n"
                                            "'help all' returns general help")
-        add("open", CM.open, "Reads the file for further modifications.\n"
-                             "Format: <filename> "
-                             "<optional: result_name>")
-        add("path", CM.set_path, "Sets current path.\n"
-                                 "Format: <path>")
-        add("save", CM.save, "Saves track to file.\n"
-                             "Format: <name> <filename>")
-        add("rename", CM.rename_track, "Renames track.\n"
-                                       "Format: <name> <new name>")
-        add("close", CM.delete_track, "Deletes track from the list.\n"
-                                      "Format: <name>")
-        add("part", CM.part, "Gets part of track.\n"
-                             "Format: <name> <start_time> "
-                             "<finish_time> <optional: result_name>")
-        add("join", CM.join, "Joins tracks.\n"
-                             "Format: <name1> <name2> ...")
-        add("insert", CM.insert, "Insert track in other track.\n"
-                                 "Format: <base_track> <insert_track> "
-                                 "<start_time> <optional: result_name>")
-        add("delete", CM.delete, "Delete part of track.\n"
-                                 "Format: <name> <start_time> "
-                                 "<finish_time> "
-                                 "<optional: result_name>")
-        add("fade", CM.fade, "Fades track in or out.\n"
-                             "Format: <in/out> <name> "
-                             "<optional: result_name>")
-        add("speed", CM.change_speed, "Changes speed of track.\n"
-                                      "Format: <name> <ratio> "
+        add("open", model.open, "Reads the file for further modifications.\n"
+                                "Format: <filename> "
+                                "<optional: result_name>")
+        add("path", model.set_path, "Sets current path.\n"
+                                    "Format: <path>")
+        add("save", model.save, "Saves track to file.\n"
+                                "Format: <name> <filename>")
+        add("rename", model.rename_track, "Renames track.\n"
+                                          "Format: <name> <new name>")
+        add("close", model.delete_track, "Deletes track from the list.\n"
+                                         "Format: <name>")
+        add("part", model.part, "Gets part of track.\n"
+                                "Format: <name> <start_time> "
+                                "<finish_time> <optional: result_name>")
+        add("join", model.join, "Joins tracks.\n"
+                                "Format: <name1> <name2> ...")
+        add("insert", model.insert, "Insert track in other track.\n"
+                                    "Format: <base_track> <insert_track> "
+                                    "<start_time> <optional: result_name>")
+        add("delete", model.delete, "Delete part of track.\n"
+                                    "Format: <name> <start_time> "
+                                    "<finish_time> "
+                                    "<optional: result_name>")
+        add("fade", model.fade, "Fades track in or out.\n"
+                                "Format: <in/out> <name> "
+                                "<optional: result_name>")
+        add("speed", model.change_speed, "Changes speed of track.\n"
+                                         "Format: <name> <ratio> "
+                                         "<optional: result_name>")
+        add("reverse", model.reverse, "Reverses the track.\n"
+                                      "Format: <name> "
                                       "<optional: result_name>")
-        add("reverse", CM.reverse, "Reverses the track.\n"
-                                   "Format: <name> <optional: result_name>")
-        add("sum", CM.get_sum, "Gets sum of tracks.\n"
-                               "Format: <name1> <name2> ...")
-        add("volume", CM.change_loudness, "Changes volume level.\n"
-                                          "Format: <name> <ratio> "
-                                          "<optional: result_name>")
-        add("compress", CM.compress, "Provides sound compression which "
-                                     "is basically casting all the parts"
-                                     "to the same volume level.\n"
-                                     "Format: <name> <ratio> "
-                                     "<optional: result_name>")
-        add("list", CM.get_all_tracks_names, "Returns all the active tracks")
+        add("sum", model.get_sum, "Gets sum of tracks.\n"
+                                  "Format: <name1> <name2> ...")
+        add("volume", model.change_loudness, "Changes volume level.\n"
+                                             "Format: <name> <ratio> "
+                                             "<optional: result_name>")
+        add("compress", model.compress, "Provides sound compression which "
+                                        "is basically casting all the parts"
+                                        "to the same volume level.\n"
+                                        "Format: <name> <ratio> "
+                                        "<optional: result_name>")
+        add("list", model.get_all_tracks_names, "Returns all the "
+                                                "active tracks")
         add("exit", self.exit_program, "Exits the program.")
 
     def get_help(self):

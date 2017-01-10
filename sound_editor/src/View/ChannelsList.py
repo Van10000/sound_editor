@@ -2,7 +2,7 @@ from PyQt4 import QtGui, QtCore
 from pyqtgraph import PlotWidget, PlotDataItem, ViewBox
 from Core.WaveState import WaveState
 from View.Channel import Channel
-from View.Constants import Constants
+from View import Constants
 from View.ActionsPanel import ActionsPanel
 from View.TimePanel import TimePanel
 
@@ -14,7 +14,8 @@ class ChannelsList(QtGui.QWidget):
 
         self.channels = [Channel(ch_model)
                          for ch_model in self.track_model.channel_models]
-        for channel, channel_model in zip(self.channels, self.track_model.channel_models):
+        for channel, channel_model in zip(self.channels,
+                                          self.track_model.channel_models):
             channel_model.call_after_change.append(channel.repaint)
 
         self.time_panel = TimePanel(self.channels[0])
@@ -34,6 +35,7 @@ class ChannelsList(QtGui.QWidget):
         self.setLayout(self.wrapping_layout)
 
     def update_track(self):
-        for channel, channel_model in zip(self.channels, self.track_model.channel_models):
+        for channel, channel_model in zip(self.channels,
+                                          self.track_model.channel_models):
             channel.reset_channel_model(channel_model)
         self.time_panel.reset_channel(self.channels[0])

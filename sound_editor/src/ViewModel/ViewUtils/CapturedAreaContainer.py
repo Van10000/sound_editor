@@ -1,3 +1,6 @@
+class ContainerReleasedError(Exception):
+    def __init__(self):
+        super("Container is released at the moment.")
 
 
 class CapturedAreaContainer:
@@ -43,7 +46,7 @@ class CapturedAreaContainer:
             self.current_coord = x_coord
             self._after_change()
         else:
-            raise Exception("Container is released at the moment.")
+            raise ContainerReleasedError()
 
     def release(self):
         self.is_released = True

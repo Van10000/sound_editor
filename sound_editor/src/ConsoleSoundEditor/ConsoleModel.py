@@ -2,7 +2,6 @@ import functools
 import os
 
 from ConsoleSoundEditor.NamedTrack import NamedTrack
-from Core.SoundEffects.SoundCompressor import SoundCompressor
 from Core.WaveState.Loudness import Loudness
 from Core.WaveState.WaveState import WaveState
 from ViewModel.ViewUtils.TimeFormatter import TimeFormatter
@@ -110,8 +109,8 @@ class ConsoleModel:
 
     def insert(self, base_track_name, insert_track_name,
                time, result_name=None):
-        base_track, put_track = self.get_tracks_with_exception(base_track_name,
-                                                               insert_track_name)
+        base_track, put_track = self.get_tracks_with_exception(
+            base_track_name, insert_track_name)
         sample = self._get_sample_number(base_track, time)
         result_track = base_track.get_inserted(put_track, sample)
         result_name = self.add_track(result_track, result_name)

@@ -1,10 +1,14 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir))
 import unittest
 
 from ViewModel.ViewUtils.TimeFormatter import TimeFormatter
 
 
 class TimeFormatterTests(unittest.TestCase):
-    def assert_time_parsed_correct(self, parsed, expected_time_m, expected_time_s, expected_time_ms):
+    def assert_time_parsed_correct(self, parsed, expected_time_m,
+                                   expected_time_s, expected_time_ms):
         time_m, time_s, time_ms = parsed
         self.assertEqual(time_m, expected_time_m)
         self.assertEqual(time_s, expected_time_s)
@@ -29,3 +33,6 @@ class TimeFormatterTests(unittest.TestCase):
     def test_format_add_leading_zeros_with_zero_precision(self):
         formatted = TimeFormatter.format(182, 0)
         self.assertEqual(formatted, "3:02")
+
+if __name__ == '__main__':
+    unittest.main()

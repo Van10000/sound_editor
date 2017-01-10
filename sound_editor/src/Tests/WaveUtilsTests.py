@@ -1,11 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.pardir))
 import numpy as np
 
 from Core.WaveState import WaveUtils
-#  TODO: refactor
-#  TODO: rename everything to snake_case
-#  TODO: arrange act assert pattern
-#  TODO: get rid of static methods and asserts. All that should be in TestingUtils.
-from Tests.NumpyArraysTests import NumpyArraysTest
+from Tests.NumpyArraysTestCase import NumpyArraysTest
+import unittest
 
 
 class TestWaveUtils(NumpyArraysTest):
@@ -20,9 +20,10 @@ class TestWaveUtils(NumpyArraysTest):
         self.check_frames_to_samples([3, 2, 1, 0], 4, [65536 + 512 + 3])
 
     def check_frames_to_samples(self, frames, sample_width, expected_samples):
-        self.assert_numpy_array_equal(WaveUtils.frames_to_samples(bytes(frames),
-                                                                  sample_width),
-                                      expected_samples)
+        self.assert_numpy_array_equal(
+            WaveUtils.frames_to_samples(bytes(frames),
+                                        sample_width),
+            expected_samples)
 
     def test_samples_to_frames(self):
         self.check_samples_to_frames([1, 2], 2, [1, 0, 2, 0])
@@ -106,3 +107,8 @@ class TestWaveUtils(NumpyArraysTest):
         self.assert_numpy_array_equal(
             WaveUtils.get_reversed(self.channelsToNumpy(channels)),
             expected_reversed)
+
+
+if __name__ == '__main__':
+    unittest.main()
+

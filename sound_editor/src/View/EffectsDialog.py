@@ -26,9 +26,11 @@ class EffectsDialog(QtGui.QDialog):
         self._effect_appliance_result = False
 
     def switch_effect(self, selected_effect_index):
-        self.effects_layout.removeWidget(self.effects_widgets[self.current_effect_index])
+        old_widget = self.effects_widgets[self.current_effect_index]
+        self.effects_layout.removeWidget(old_widget)
         self.effects_widgets[self.current_effect_index].hide()
-        self.effects_layout.addRow(self.effects_widgets[selected_effect_index])
+        new_widget = self.effects_widgets[selected_effect_index]
+        self.effects_layout.addRow(new_widget)
         self.effects_widgets[selected_effect_index].show()
         self.current_effect_index = selected_effect_index
 
@@ -36,4 +38,3 @@ class EffectsDialog(QtGui.QDialog):
         effect = self.effects_widgets[self.current_effect_index]
         if effect.apply_effect():
             self.hide()
-

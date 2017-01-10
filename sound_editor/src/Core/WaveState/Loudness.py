@@ -26,7 +26,8 @@ class Loudness:
 
     @staticmethod
     def get_constant_loudness(length, value):
-        loudness = np.full((length,), fill_value=Loudness.LOUDNESS_TYPE(value))
+        loudness = np.full((length,),
+                           fill_value=Loudness.LOUDNESS_TYPE(value))
         return loudness
 
     @staticmethod
@@ -39,5 +40,6 @@ class Loudness:
         """
         finish = start + len(loudness)
         loudness = np.append(Loudness.get_ones(start), loudness)
-        loudness = np.append(loudness, Loudness.get_ones(total_length - finish))
+        loudness = np.append(loudness,
+                             Loudness.get_ones(total_length - finish))
         return loudness

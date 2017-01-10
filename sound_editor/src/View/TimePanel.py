@@ -2,9 +2,6 @@ import math
 from PyQt4 import QtGui, QtCore
 from ViewModel.ViewUtils.TimeFormatter import TimeFormatter
 
-# it's necessary for time panel to have the same size as channel for which this panel is created
-# obviously, otherwise time would be displayed incorrectly
-
 
 class TimePanel(QtGui.QWidget):
     TIME_COLOR = QtGui.QColor(0, 0, 0)
@@ -49,13 +46,7 @@ class TimePanel(QtGui.QWidget):
 
     @staticmethod
     def get_time_precision(time_moments):
-        moments_number_coefficient = math.log10(10 * len(time_moments))
-        range_size_coefficient = math.log10(time_moments[-1] - time_moments[0])
-        total_coefficient = moments_number_coefficient - range_size_coefficient
+        moments_number_ratio = math.log10(10 * len(time_moments))
+        range_size_ratio = math.log10(time_moments[-1] - time_moments[0])
+        total_coefficient = moments_number_ratio - range_size_ratio
         return int(max(total_coefficient, 0))
-
-
-
-
-
-

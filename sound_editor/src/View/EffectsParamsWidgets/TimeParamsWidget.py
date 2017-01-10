@@ -14,7 +14,8 @@ class TimeParamsWidget(EffectParamsWidget):
         self.setLayout(self.main_layout)
 
     def set_bounds(self):
-        start_frame, finish_frame = self.track_model.get_captured_start_and_finish()
+        start_frame, finish_frame = \
+            self.track_model.get_captured_start_and_finish()
         self.set_bounds_frame(start_frame, finish_frame)
 
     def set_bounds_frame(self, start_frame, finish_frame):

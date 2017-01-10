@@ -9,5 +9,6 @@ class PowOfTwoChannelCompressor:
     def get_compressed(self, start=0, stop=None):
         if stop is None:
             stop = len(self.channel)
-        compressed_indexes = FramesGridUtils.get_steps_coordinates(start, stop, self.max_frames_number)
+        compressed_indexes = FramesGridUtils.get_steps_coordinates(
+            start, stop, self.max_frames_number)
         return [self.channel[index] for index in compressed_indexes]

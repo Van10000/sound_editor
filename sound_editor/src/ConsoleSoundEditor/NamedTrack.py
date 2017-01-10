@@ -1,4 +1,5 @@
 
+
 class NamedTrack:
     def __init__(self, name, wave_state):
         self.name = name

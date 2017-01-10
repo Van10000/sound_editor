@@ -4,7 +4,6 @@ from Core import Utils
 from ViewModel.AbstractModel import AbstractModel
 from ViewModel.ChannelModel import ChannelModel
 from ViewModel.ViewUtils.CapturedAreaContainer import CapturedAreaContainer
-import threading
 import functools
 
 
@@ -17,8 +16,10 @@ class TrackModel(AbstractModel):
         self.channel_models = list(self.build_channel_models())
         self.call_after_wave_state_changed = []
         self.captured_area_container = CapturedAreaContainer()
-        self.captured_area_container.call_after_capture.append(self.drop_other_captures)
-        self.captured_area_container.call_after_change.append(self._after_change)
+        self.captured_area_container.call_after_capture.append(
+            self.drop_other_captures)
+        self.captured_area_container.call_after_change.append(
+            self._after_change)
         self.start_frame = 0
         self.finish_frame = len(wave_state)
         self.view_model = view_model
@@ -63,6 +64,9 @@ class TrackModel(AbstractModel):
             return self.wave_state.get_part(self.captured_start,
                                             self.captured_finish)
 
+    def update(self):
+        self._wave_state_changed()
+
     def set_wave_state(self, new_wave_state):
         window_length = len(self)
         if len(new_wave_state) <= window_length:
@@ -91,7 +95,8 @@ class TrackModel(AbstractModel):
             new_state = self.wave_state.get_with_deleted_part(
                 self.captured_start, self.captured_finish)
             self.set_wave_state(new_state)
-            self.captured_area_container.capture_segment(self.captured_start, 0)
+            self.captured_area_container.capture_segment(self.captured_start,
+                                                         0)
 
             self._wave_state_changed()
 
@@ -119,7 +124,8 @@ class TrackModel(AbstractModel):
     def adjust_loudness(self, ratio):
         start, finish = self.get_captured_start_and_finish()
         loudness = Loudness.get_constant_loudness(finish - start, ratio)
-        loudness = Loudness.get_on_segment(loudness, start, len(self.wave_state))
+        loudness = Loudness.get_on_segment(loudness, start,
+                                           len(self.wave_state))
         self.apply_loudness(loudness)
 
     def scale(self, x_mid_ratio, scale_factor):
@@ -135,12 +141,14 @@ class TrackModel(AbstractModel):
                                              mid_frame=mid_frame,
                                              scale_factor=real_scale_factor)
         self.start_frame = max(0, get_bound_scaled(self.start_frame))
-        self.finish_frame = min(len(self.wave_state), get_bound_scaled(self.finish_frame))
+        self.finish_frame = min(len(self.wave_state),
+                                get_bound_scaled(self.finish_frame))
         self._after_change()
 
     def fade(self, start_frame, finish_frame, from_start):
         loudness = Loudness.get_fade(finish_frame - start_frame, from_start)
-        loudness = Loudness.get_on_segment(loudness, start_frame, len(self.wave_state))
+        loudness = Loudness.get_on_segment(loudness, start_frame,
+                                           len(self.wave_state))
         self.apply_loudness(loudness)
 
     def fade_in(self, start_frame, finish_frame):
@@ -165,7 +173,8 @@ class TrackModel(AbstractModel):
         self.set_wave_state(new_state)
         finish_frame, start_frame = map(self.get_frame_from_time,
                                         (finish_time, start_time,))
-        # reset finish and start frames because frame rate could have been changed
+        # reset finish and start frames because
+        # frame rate could have been changed
         new_length = int(round((finish_frame - start_frame) / ratio))
         self.captured_area_container.capture_segment(start_frame,
                                                      new_length)
@@ -176,12 +185,13 @@ class TrackModel(AbstractModel):
                                                    finish_frame,
                                                    ratio)
         self.set_wave_state(new_state)
-        self.captured_area_container.capture_segment(start_frame,
-                                                     finish_frame - start_frame)
+        self.captured_area_container.capture_segment(
+            start_frame, finish_frame - start_frame)
         self._wave_state_changed()
 
     def _get_scaled_len(self, scale_factor):
-        return Utils.put_in_bounds(self.MINIMAL_LEN, len(self.wave_state), scale_factor * len(self))
+        return Utils.put_in_bounds(self.MINIMAL_LEN, len(self.wave_state),
+                                   scale_factor * len(self))
 
     @staticmethod
     def _get_bound_scaled(bound, mid_frame, scale_factor):

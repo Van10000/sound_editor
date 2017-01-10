@@ -17,7 +17,8 @@ class TimeAndRatioParamsWidget(EffectParamsWidget):
         self.setLayout(self.main_layout)
 
     def set_bounds(self):
-        start_frame, finish_frame = self.track_model.get_captured_start_and_finish()
+        start_frame, finish_frame = \
+            self.track_model.get_captured_start_and_finish()
         self.set_bounds_frame(start_frame, finish_frame)
 
     def set_bounds_frame(self, start_frame, finish_frame):
@@ -35,16 +36,19 @@ class TimeAndRatioParamsWidget(EffectParamsWidget):
             ratio = float(self.speed_ratio_input.line_edit.text())
         except ValueError:
             message_box = QtGui.QMessageBox()
-            message_box.warning(self.parent(), "Wrong input", "Ratio should be a decimal number")
+            message_box.warning(self.parent(), "Wrong input",
+                                "Ratio should be a decimal number")
             return False
         else:
             if ratio < 0 or ratio > self.max_possible_ratio:
                 message_box = QtGui.QMessageBox()
                 message_box.warning(
                     self.parent(), "Wrong input",
-                    "Ratio should be less than {} and greater than 0".format(self.max_possible_ratio))
+                    "Ratio should be less than {} and greater than 0"
+                        .format(self.max_possible_ratio))
                 return False
-            start_frame, finish_frame = map(self.track_model.get_frame_from_time,
-                                            (start_time, finish_time,))
+            start_frame, finish_frame = \
+                map(self.track_model.get_frame_from_time,
+                    (start_time, finish_time,))
             effect_func(start_frame, finish_frame, ratio)
             return True

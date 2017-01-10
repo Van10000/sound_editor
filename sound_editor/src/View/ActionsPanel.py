@@ -1,5 +1,5 @@
 from PyQt4 import QtGui, QtCore
-from View.Constants import Constants
+from View import Constants
 from View.EffectsDialog import EffectsDialog
 
 
@@ -28,7 +28,9 @@ class ActionsPanel(QtGui.QWidget):
     def show_effects_dialog(self):
         for widget in self.effects_widgets:
             widget.validate()
-        effects_dialog = EffectsDialog(self.effects_names, self.effects_widgets, self.parent())
+        effects_dialog = EffectsDialog(self.effects_names,
+                                       self.effects_widgets,
+                                       self.parent())
         effects_dialog.show()
 
     def add_effect(self, name, widget):

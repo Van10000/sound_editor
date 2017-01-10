@@ -27,7 +27,8 @@ class SoundCompressor:
         cur_sum = sum(abs_channel[0:window_size])
         half_size = window_size // 2
         float_window_size = np.float64(window_size)
-        result = np.full((len(channel),), 0, dtype=WaveState.WaveState.SAMPLE_TYPE)
+        result = np.full((len(channel),), 0,
+                         dtype=WaveState.WaveState.SAMPLE_TYPE)
         for i in range(0, len(channel)):
             if i - half_size >= 0 and i + half_size < len(channel):
                 cur_sum -= abs_channel[i - half_size]
@@ -42,4 +43,3 @@ class SoundCompressor:
                 cur_res = -cur_res
             np.put(result, i, cur_res)
         return result
-

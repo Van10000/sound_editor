@@ -31,5 +31,6 @@ class TimeInputWidget(QtGui.QWidget):
             return float(self.start_time_text), float(self.finish_time_text)
         except ValueError:
             message_box = QtGui.QMessageBox()
-            message_box.warning(self.parent(), "Wrong input", "Time should be a decimal number")
+            message_box.warning(self.parent(), "Wrong input",
+                                "Time should be a decimal number")
             return False

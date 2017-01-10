@@ -11,7 +11,8 @@ TYPES = {
 
 
 def frames_to_samples(frames, sample_width):
-    return np.fromstring(frames, dtype=TYPES[sample_width]).astype(dtype=SAMPLE_TYPE)
+    return np.fromstring(frames,
+                         dtype=TYPES[sample_width]).astype(dtype=SAMPLE_TYPE)
 
 
 def samples_to_frames(samples, sample_width):
@@ -26,7 +27,8 @@ def samples_to_channels(samples, channels_number):
 def channels_to_samples(channels):
     result = np.zeros(sum(map(len, channels)), dtype=SAMPLE_TYPE)
     for channel_index in range(len(channels)):
-        np.put(result, np.arange(channel_index, len(result), len(channels)), channels[channel_index])
+        np.put(result, np.arange(channel_index, len(result),
+                                 len(channels)), channels[channel_index])
     return result
 
 
@@ -69,7 +71,8 @@ def get_average_channel(channels):
 
 
 def get_sum_channels(channels1, channels2):
-    return [NumpyUtils.numpy_sum(ch1, ch2) for ch1, ch2 in zip(channels1, channels2)]
+    return [NumpyUtils.numpy_sum(ch1, ch2)
+            for ch1, ch2 in zip(channels1, channels2)]
 
 
 def change_channels_sample_width(channels, sample_width_multiplier):
